@@ -1,0 +1,17 @@
+body {
+    background: rgb(132, 185, 132);
+    font-family: Arial, Helvetica, sans-serif;
+}
+.assignment {
+    display: flex;
+    padding: 10px;
+}
+.assignment img{
+    width: 200px;
+    padding: 10px;
+    margin: 10px;
+    background:lightgrey;
+}
+h1 {
+    color: rgb(101, 33, 101)
+}
