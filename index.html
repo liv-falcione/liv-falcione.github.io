@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DC Traffic Accident Dashboard</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        h1, h3 {
+            text-align: center;
+        }
+        #map {
+            height: 400px;
+        }
+    </style>
+</head>
+<body>
+    <h1>DC Traffic Accident Dashboard</h1>
+
+    <div style="text-align: center; margin-bottom: 40px;">
+        <p>This dashboard provides an overview of traffic accidents in Washington, DC, from 2020 to 2025...</p>
+    </div>
+
+    <div>
+        <h3>Filter by Crash Severity</h3>
+        <select id="severity-dropdown">
+            <option value="All">All</option>
+            <option value="Fatal">Fatal</option>
+            <option value="Major">Major</option>
+            <option value="Minor">Minor</option>
+        </select>
+    </div>
+
+    <!-- Visualization 1: Heatmap -->
+    <div>
+        <h3>1. Heatmap: Incidents by Ward and Month</h3>
+        <div id="heatmap"></div>
+    </div>
+
+    <!-- Visualization 2: Map -->
+    <div>
+        <h3>2. Map: Accident Locations by Severity</h3>
+        <div id="map"></div>
+    </div>
+
+    <!-- Visualization 3: Bar Chart -->
+    <div>
+        <h3>3. Bar Chart: Total Accidents by Ward</h3>
+        <div id="bar-chart"></div>
+    </div>
+
+    <!-- Visualization 4: Time Series -->
+    <div>
+        <h3>4. Time Series: Monthly Incidents & Injuries</h3>
+        <div id="time-series"></div>
+    </div>
+
+    <div>
+        <h3>Data Source</h3>
+        <p>The data used in this dashboard is sourced from Data.gov, 'Crashes in DC'.</p>
+    </div>
+
+    <script src="custom.js"></script>
+</body>
+</html>
