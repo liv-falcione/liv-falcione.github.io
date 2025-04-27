@@ -4,25 +4,19 @@ import plotly.express as px
 from dash import Dash, dcc, html
 import dash
 
-# URL for the CSV file
 url = "https://opendata.dc.gov/api/download/v1/items/70392a096a8e431381f1f692aaa06afd/csv?layers=24"
 
-# Fetch CSV content with requests and read it into pandas
-response = requests.get(url, verify=False)  # disable SSL verification
-response.raise_for_status()  # raises an error if the download fails
+response = requests.get(url, verify=False)  
+response.raise_for_status()  
 data = response.content
 
-# Load CSV data into pandas
 from io import StringIO
 df = pd.read_csv(StringIO(data.decode('utf-8')), parse_dates=["REPORTDATE"], low_memory=False)
 
-# Now you can continue with your original data processing code
 df = df[(df['REPORTDATE'].dt.year >= 2020) & (df['REPORTDATE'].dt.year <= 2025)]
 
-# Extract year-month for monthly analysis
 df['YearMonth'] = df['REPORTDATE'].dt.to_period('M').astype(str)
 
-# Injury-related columns
 injury_cols = [
     'MAJORINJURIES_BICYCLIST', 'MINORINJURIES_BICYCLIST', 'UNKNOWNINJURIES_BICYCLIST',
     'FATAL_BICYCLIST', 'MAJORINJURIES_DRIVER', 'MINORINJURIES_DRIVER', 'UNKNOWNINJURIES_DRIVER',
@@ -33,24 +27,19 @@ injury_cols = [
     'UNKNOWNINJURIESOTHER', 'FATALOTHER'
 ]
 
-# Fill NaNs and calculate total injuries
 df[injury_cols] = df[injury_cols].fillna(0)
 df['TotalInjuries'] = df[injury_cols].sum(axis=1)
 
-# Monthly summary for time series
 monthly = df.groupby('YearMonth').agg({'CRIMEID': 'count', 'TotalInjuries': 'sum'}).reset_index()
 monthly.rename(columns={'CRIMEID': 'Incidents'}, inplace=True)
 
-# Classify crashes by severity for drivers
 df['CrashSeverity'] = 'Minor'
 df.loc[df['FATAL_DRIVER'] > 0, 'CrashSeverity'] = 'Fatal'
 df.loc[df['MAJORINJURIES_DRIVER'] > 0, 'CrashSeverity'] = 'Major'
 
-# Initialize the Dash app
 app = Dash(__name__)
 app.title = "DC Traffic Crash Dashboard"
 
-# Dash layout
 app.layout = html.Div(style={'fontFamily': 'Arial', 'padding': '20px'}, children=[
     html.H1("DC Traffic Accident Dashboard", style={'textAlign': 'center'}),
 
@@ -111,19 +100,15 @@ app.layout = html.Div(style={'fontFamily': 'Arial', 'padding': '20px'}, children
         html.P("The data used in this dashboard is sourced from Data.gov, 'Crashes in DC'."),
     ], style={'marginTop': '40px'})
 ])
-
-# Callback to update the map based on severity dropdown
 @app.callback(
     dash.dependencies.Output('map', 'figure'),
     [dash.dependencies.Input('severity-dropdown', 'value')]
 )
 def update_map(severity):
-    # Filter data based on the selected severity
     filtered_data = df[df['CrashSeverity'] == severity] if severity != 'All' else df
     return px.scatter_mapbox(filtered_data, lat="LATITUDE", lon="LONGITUDE", color="CrashSeverity",
                              color_discrete_map={"Fatal": "red", "Major": "orange", "Minor": "green"},
                              mapbox_style="carto-positron", zoom=11, title="Accident Locations by Severity")
 
-# Run the app
 if __name__ == "__main__":
     app.run(debug=True)
